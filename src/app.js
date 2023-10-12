@@ -3,8 +3,8 @@ let storedBreeds=[];
 let filteredBreeds=[];
 let breedGroup=[];
 document.querySelector("#btnSearch").addEventListener("click",filterBreeds);
-function createRow(name, imageURL, description) {
-  return `<div class="media flex-column flex-sm-row mt-0 mb-3">
+function createRow(id,name, imageURL, description,breedGroup) {
+  return `<div class="dog-element media flex-column flex-sm-row mt-0 mb-3" id="${id}">
             <div class="mr-sm-3 mb-2 mb-sm-0">
             <div class="card-img-actions">
                 <a href="#" data-abc="true">
@@ -25,7 +25,7 @@ function createRow(name, imageURL, description) {
             </h6>
             <ul class="list-inline list-inline-dotted text-muted mb-2">
                 <li class="list-inline-item">
-                <i class="fa fa-book mr-2"></i> Book tutorials
+                <i class="fa fa-book mr-2"></i> ${breedGroup}
                 </li>
             </ul>
             ${description}
@@ -38,14 +38,22 @@ async function populate(){
         storedBreeds =  await getListOfDogs();
         storedBreeds.forEach(dog => {
             let imgUrl =`https://cdn2.thedogapi.com/images/${dog.reference_image_id}.jpg`
-            listBody.innerHTML += createRow(dog.name,imgUrl,dog.temperament);
+            listBody.innerHTML += createRow(dog.id,dog.name,imgUrl,dog.temperament,dog.breed_group);
         }); 
         breedGroup = [...new Set(storedBreeds.map(breed=>breed.breed_group))];
-        console.log("breed Group:",breedGroup )
+    
+
     } catch (error) {
         
     }   finally{
-        populateBreedGroupSelect()
+        populateBreedGroupSelect();
+        let dogElements = document.querySelectorAll(".dog-element");
+        dogElements.forEach(dogElement => {
+            dogElement.addEventListener("click",()=>{
+                openDetails(dogElement.id);
+            })
+        });
+
     }
     // listBody.innerHTML += createRow("baggy","jgyhbikjn","kjdsfjfbhjdbfhjsdbhjb");
 }
@@ -110,4 +118,15 @@ function populateWithFilter(){
 
 function clearList(){
     listBody.innerHTML =""
+}
+function openDetails(id){
+    let dog = storedBreeds.find(dog=> dog.id== id);
+    cleanModal();
+    populateModal(dog);
+    $('#exampleModalCenter').modal("toggle");
+}
+function cleanModal(){}
+function populateModal(dog){
+
+    console.log(dog);
 }
