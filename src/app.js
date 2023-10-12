@@ -1,5 +1,7 @@
 const listBody = document.querySelector("#list-body");
-
+let storedBreeds=[];
+let filteredBreeds=[];
+document.querySelector("#btnSearch").addEventListener("click",filterBreeds);
 function createRow(name, imageURL, description) {
   return `<div class="media flex-column flex-sm-row mt-0 mb-3">
             <div class="mr-sm-3 mb-2 mb-sm-0">
@@ -32,8 +34,8 @@ function createRow(name, imageURL, description) {
 
 async function populate(){
     try {
-        let dogList =  await getListOfDogs();
-        dogList.forEach(dog => {
+        storedBreeds =  await getListOfDogs();
+        storedBreeds.forEach(dog => {
             let imgUrl =`https://cdn2.thedogapi.com/images/${dog.reference_image_id}.jpg`
             listBody.innerHTML += createRow(dog.name,imgUrl,dog.temperament);
         });  
@@ -45,15 +47,37 @@ async function populate(){
     // listBody.innerHTML += createRow("baggy","jgyhbikjn","kjdsfjfbhjdbfhjsdbhjb");
 }
 
-async function getListOfDogs(){
+async function getListOfDogs(breed){
     let result = await fetch("https://api.thedogapi.com/v1/breeds");
     return await result.json();
 }
 
-
-
-
-
-
-
 populate();
+
+
+
+
+function filterBreeds(){
+
+    let filter_name=document.querySelector("#searchbox_name");
+
+    filteredBreeds = storedBreeds.filter((breed)=>{
+       return breed.name.includes(filter_name.value);
+    })
+    console.log(filteredBreeds)
+    console.log(filter_name.value);
+    clearList();
+    populateWithFilter();
+    
+
+}
+function populateWithFilter(){
+    filteredBreeds.forEach(dog => {
+        let imgUrl =`https://cdn2.thedogapi.com/images/${dog.reference_image_id}.jpg`
+        listBody.innerHTML += createRow(dog.name,imgUrl,dog.temperament);
+    });  
+}
+
+function clearList(){
+    listBody.innerHTML =""
+}
